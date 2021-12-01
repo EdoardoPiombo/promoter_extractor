@@ -5,8 +5,9 @@ from Bio import SeqIO
 #arguments
 parser = ap.ArgumentParser()
 parser.add_argument("-g", "--gff", help="input gff file")
-parser.add_argument("-d", "--genome", help="input genome fasta file")
-parser.add_argument("-d", "--length", help="maximum promoter length")
+parser.add_argument("-s", "--genome", help="input genome fasta file")
+parser.add_argument("-l", "--length", help="maximum promoter length")
+parser.add_argument("-a", "--allow-overlapping",action='store_true', help="allows promoters of different genes to overlap one another")
 parser.add_argument("-o", "--output", help="output gff file")
 
 args = parser.parse_args()
@@ -53,26 +54,30 @@ for record in SeqIO.parse(open(genome), "fasta"):
                             promline['start'] = promline['end'] - 1
                             line['start'] = promline['start']
                 elif prevline['sense'] == '-':
+                    try:
+                        if args.allow-overlapping == True:
                     # This part is to make sure to not have overlapping promoters.
                     # When two promoters meet each other the distance between them is equally distributed.
                     # The finaldata of the previous line is changed accordingly
-                    if promline['start'] <= prevline['end'] :
-                        distance = promline['end'] - promprevline['start']
-                        if distance > 0:
-                            promprevline['end'] = promprevline['start'] + (round(distance/2))
-                            prevline['end'] = promprevline['end']
-                            finaldata.loc[finalid-1] = promprevline
-                            finaldata.loc[finalid] = prevline
-                            promline['start'] = promline['end'] - (round(distance/2)) + 1
-                            line['start'] = promline['start']
-                            if promline['start'] > promline['end']:
-                                promline['start'] = promline['end'] - 1
-                                line['start'] = promline['start']
-                        else:
-                            prevline['end'] = promprevline['start'] + 1
-                            promprevline['end'] = prevline['end']
-                            promline['start'] = promline['end'] - 1
-                            line['start'] = promline['start']
+                            if promline['start'] <= prevline['end'] :
+                                distance = promline['end'] - promprevline['start']
+                                if distance > 0:
+                                    promprevline['end'] = promprevline['start'] + (round(distance/2))
+                                    prevline['end'] = promprevline['end']
+                                    finaldata.loc[finalid-1] = promprevline
+                                    finaldata.loc[finalid] = prevline
+                                    promline['start'] = promline['end'] - (round(distance/2)) + 1
+                                    line['start'] = promline['start']
+                                    if promline['start'] > promline['end']:
+                                        promline['start'] = promline['end'] - 1
+                                        line['start'] = promline['start']
+                                else:
+                                    prevline['end'] = promprevline['start'] + 1
+                                    promprevline['end'] = prevline['end']
+                                    promline['start'] = promline['end'] - 1
+                                    line['start'] = promline['start']
+                    except NameError:
+                        pass
         elif line['sense'] == '-' :
             if (line['end'] + length) < len(record.seq):
                 promline['start'] = promline['end'] +1
