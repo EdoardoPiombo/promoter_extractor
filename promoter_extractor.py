@@ -7,7 +7,7 @@ parser = ap.ArgumentParser()
 parser.add_argument("-g", "--gff", help="input gff file")
 parser.add_argument("-s", "--genome", help="input genome fasta file")
 parser.add_argument("-l", "--length", help="maximum promoter length")
-parser.add_argument("-a", "--allow-overlapping",action='store_true', help="allows promoters of different genes to overlap one another")
+parser.add_argument("-p", "--prevent-overlapping",action='store_true', help="prevents promoters of different genes to overlap one another. When two promoters would overlap each other the distance between them is equally distributed")
 parser.add_argument("-o", "--output", help="output gff file")
 
 args = parser.parse_args()
@@ -55,7 +55,7 @@ for record in SeqIO.parse(open(genome), "fasta"):
                             line['start'] = promline['start']
                 elif prevline['sense'] == '-':
                     try:
-                        if args.allow-overlapping == True:
+                        if args.prevent-overlapping == True:
                     # This part is to make sure to not have overlapping promoters.
                     # When two promoters meet each other the distance between them is equally distributed.
                     # The finaldata of the previous line is changed accordingly
