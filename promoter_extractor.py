@@ -16,7 +16,7 @@ args = parser.parse_args()
 gff = args.gff
 genome = args.genome
 output = args.output
-length = args.length
+length = int(args.length)
 
 data = pd.read_csv(gff, sep = '\t', names = ['scaffold', 'predictor', 'feature', 'start', 'end', 'thing', 'sense', 'RF', 'description'], comment = '#')
 data = data.where(data['feature'] == 'gene').dropna()
