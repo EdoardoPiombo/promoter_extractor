@@ -130,5 +130,7 @@ droppable = finaldata.where(finaldata['to_remove'] == 'yes').dropna().index.to_l
 finaldata.drop(['to_remove'], axis = 1, inplace = True)
 finaldata.drop(droppable, axis = 0, inplace = True)
 finaldata = finaldata.reset_index(drop = True)
+finaldata['start'] = finaldata['start'].astype(int)
+finaldata['end'] = finaldata['end'].astype(int)
         
 finaldata.to_csv(path_or_buf=output, sep = '\t', index =False, header=False)
